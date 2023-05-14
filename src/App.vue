@@ -1,30 +1,38 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <div>
+    <div v-if="error" class="position-fixed bg-danger py-2 px-3">
+      <h5 class="text-white">{{ error }}</h5>    
+    </div>
+    <Menu v-if="isLoggedIn" />
+    <div class="container" v-if="isLoadedData">
+      <router-view />
+    </div>
+  </div>
 </template>
 
+<script>
+import { mapGetters } from 'vuex'
+import Menu from '@/components/Menu.vue'
+
+export default {
+  name: 'App',
+  components: {
+    Menu,
+  },
+  computed: {
+    ...mapGetters(['isLoggedIn', 'isLoadedData', 'error']),
+  },
+  created() {
+    if (localStorage.getItem('gamescribe-authToken')) {
+      this.$store.commit('setAuthToken', localStorage.getItem('gamescribe-authToken'))
+      this.$store.dispatch('loadAll');
+      if (localStorage.getItem('zvolenyProjekt')) {
+        this.$store.commit('zvolitProjekt', localStorage.getItem('zvolenyProjekt'))
+      }
+    }
+  }
+}
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
 </style>

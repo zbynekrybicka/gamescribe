@@ -1,24 +1,58 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHashHistory } from 'vue-router'
+import HomeView from '@/views/HomeView'
+import ProjectDetail from '@/components/ProjectDetail'
+import LocationView from '@/views/LocationView'
+import NpcView from '@/views/NpcView'
+import ItemView from '@/views/ItemView'
+import CutSceneView from '@/views/CutSceneView'
+import FamilyTreeView from '@/views/FamilyTreeView'
 
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: HomeView,
   },
+
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
+    path: '/projects/:id',
+    name: 'projectDetail',
+    component: ProjectDetail,
+  },
+
+  {
+    path: '/locations/:id?',
+    name: 'locationView',
+    component: LocationView,
+  },
+
+  {
+    path: '/npc/:id?',
+    name: 'NpcView',
+    component: NpcView,
+  },
+
+  {
+    path: '/family-tree',
+    name: 'FamilyTreeView',
+    component: FamilyTreeView,
+  },
+
+  {
+    path: '/items/:id?',
+    name: 'ItemView',
+    component: ItemView,
+  },
+
+  {
+    path: '/cut-scenes/:id?',
+    name: 'CutSceneView',
+    component: CutSceneView,
+  },
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHashHistory(process.env.BASE_URL),
   routes
 })
 
