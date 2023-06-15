@@ -11,7 +11,7 @@
               <router-link to="/" class="nav-link">Projekty</router-link>
             </li>
             <template v-if="jeZvolenyProjekt">
-            <li class="nav-item">
+              <li class="nav-item">
               <router-link to="/locations" class="nav-link">Lokace</router-link>
             </li>
             <li class="nav-item">

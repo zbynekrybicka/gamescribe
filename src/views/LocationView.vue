@@ -1,31 +1,31 @@
 <template>
     <div>
-      <Table v-if="!id" :data="stats" :headers="{ polozka: 'Položka', hodnota: 'Hodnota'}" />
-      <Table v-if="!id" :data="locations" @row-click="showLocation" :headers="{ id: 'ID', name: 'Název', habitability: 'Obyvatelnost'} "/>
+      <div v-if="!id">
+        <!--Table :data="stats" :headers="{ polozka: 'Položka', hodnota: 'Hodnota'}" /-->
+        <Structure :data="locations" :format="location => location.name" @item-click="showLocation" />
+      </div>
       <LocationDetail v-if="id" :id="id" />
     </div>
   </template>
   
   <script>
   import Table from "@/components/Table.vue";
+  import Mapa from "@/components/Mapa.vue";
+  import Structure from "@/components/Structure.vue";
   import LocationDetail from "@/components/LocationDetail.vue";
   import LocationStats from "@/components/LocationStats.vue";
   
   export default {
     components: {
       Table,
+      Structure,
       LocationDetail,
-      LocationStats
+      LocationStats,
+      Mapa
     },
     computed: {
       locations() {
-        return this.$store.getters.locations.map(location => ({
-          id: location.id,
-          parent_id: location.parent_id,
-          name: location.name,
-          property: location.property,
-          habitability: location.habitability,
-        }));
+        return this.$store.getters.locations
       },
       stats() {
         return [
@@ -64,8 +64,8 @@
       }
     },
     methods: {
-      showLocation(event) {
-        this.$router.push("/locations/" + event);
+      showLocation(location) {
+        this.$router.push("/locations/" + location.id);
       },
       calculateHabitability(code) {
         const h = {

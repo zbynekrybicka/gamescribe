@@ -48,7 +48,7 @@ const routes = [
     path: '/cut-scenes/:id?',
     name: 'CutSceneView',
     component: CutSceneView,
-  },
+  }
 ]
 
 const router = createRouter({

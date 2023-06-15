@@ -34,12 +34,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(array('error' => $e->getMessage()));
     }
 } else if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-    $stmt = $db->prepare('UPDATE locations SET name=:name, description=:description, habitability=:habitability, property=:property  WHERE id=:id AND project_id IN (select id from projects where user_id=:user_id)');
+    $stmt = $db->prepare('UPDATE locations SET 
+        name=:name, 
+        description=:description, 
+        habitability=:habitability, 
+        property=:property, 
+        pudorys=:pudorys, 
+        barva=:barva, 
+        popisek=:popisek 
+    WHERE id=:id AND project_id IN (select id from projects where user_id=:user_id)');
     $stmt->bindValue(':name', $data['name'], SQLITE3_TEXT);
     $stmt->bindValue(':description', $data['description'], SQLITE3_TEXT);
     $stmt->bindValue(':id', $data['id'], SQLITE3_INTEGER);
     $stmt->bindValue(':user_id', $user->id, SQLITE3_INTEGER);
     $stmt->bindValue(':property', $data['property'] ?? 0, SQLITE3_INTEGER);
+    $stmt->bindValue(':pudorys', $data['pudorys'], SQLITE3_TEXT);
+    $stmt->bindValue(':barva', $data['barva'], SQLITE3_TEXT);
+    $stmt->bindValue(':popisek', $data['popisek'], SQLITE3_TEXT);
     if (isset($data['habitability'])) {
         $stmt->bindValue(':habitability', $data['habitability'], SQLITE3_TEXT);
     } else {

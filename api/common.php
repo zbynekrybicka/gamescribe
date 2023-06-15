@@ -18,7 +18,7 @@ function handleError() {
 }
 
 function checkAuth() {
-  $jwt = apache_request_headers()['Authorization'] ?? false;
+  $jwt = $_SERVER['HTTP_AUTHORIZATION'] ?? false;
   if (!$jwt) {
     return null;
   }

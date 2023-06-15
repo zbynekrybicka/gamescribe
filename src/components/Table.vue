@@ -6,8 +6,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(row, index) in shownData" :key="row.id" @click.stop="rowClicked(row.id)" :class="{ 'bg-gray-100': index % 2 === 1, 'bg-white': index % 2 !== 0 }">
-          <td v-for="(title, index) in Object.keys(headers)" :key="index" v-html="row[title]" />
+        <tr v-for="(row, index) in shownData" :key="row.id" @click.stop="rowClicked(row.id)" :class="[ 'bg-white' ]">
+          <td v-for="(title, index) in Object.keys(headers)" :key="index" v-html="row[title]" :class="className(row)"/>
         </tr>
       </tbody>
     </table>
@@ -22,6 +22,11 @@
       }
     },
     props: {
+      className: {
+        type: Function,
+        required: false,
+        default: () => '',
+      },
       headers: {
         type: Object,
         required: true

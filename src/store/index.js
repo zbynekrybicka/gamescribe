@@ -173,6 +173,9 @@ export default createStore({
         }
         state.data.locations[index].name = data.name
         state.data.locations[index].description = data.description
+        state.data.locations[index].pudorys = data.pudorys
+        state.data.locations[index].barva = data.barva
+        state.data.locations[index].popisek = data.popisek
       }
     },
 
