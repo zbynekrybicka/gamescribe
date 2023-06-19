@@ -29,6 +29,9 @@
             <div class="col-6 col-sm-4 mb-4" v-if="pudorys.length === 2">
               <button class="btn btn-primary" @click="udelatObdelnik">Udělat obdelník</button>
             </div>
+            <div class="col-6 col-sm-4 mb-4" v-if="pudorys.length === 0">
+              <button class="btn btn-primary" @click="rodicovskyPudorys">Převzít půdorys z rodiče</button>
+            </div>
           </div>
         </div>
 
@@ -40,6 +43,14 @@
         <div class="form-group">
           <label for="popisekInput">Popisek:</label>
           <input v-model="popisek" type="text" @change="handleSubmit" class="form-control" id="popisekInput">
+        </div>
+
+        <div class="form-group">
+          <label for="vrstvaInput">Vrstva</label>
+          <input v-model="vrstva" type="text" class="form-control" id="vrstvaInput"  @change="handleSubmit" list="vrstvyLokaci">
+          <datalist id="vrstvyLokaci">
+            <option v-for="vrstva of dostupneVrstvy">{{ vrstva }}</option>
+          </datalist>
         </div>
 
         <button class="btn btn-light mb-2" @click="zobrazitMapu = true">Zobrazit mapu</button>
@@ -84,12 +95,16 @@ import Mapa from '@/components/Mapa.vue'
         barva: "",
         pudorys: [],
         popisek: "",
+        vrstva: "",
       };
     },
     mounted() {
         this.loadLocation(this.id)
     },
     computed: {
+      dostupneVrstvy() {
+        return Array.from(new Set(this.locations.map(l => l.vrstva).filter(v => v)))
+      },
       locations() {
         return this.$store.getters.locations
       },
@@ -116,6 +131,15 @@ import Mapa from '@/components/Mapa.vue'
         const predchoziHodnota = this.pudorys[this.pudorys.length - 1]
         this.pudorys.push([...(predchoziHodnota ? predchoziHodnota : [0, 0])])
       },
+      rodicovskyPudorys() {        
+        const location = this.locations.find(l => l.id === this.id)
+        const parent = this.locations.find(l => l.id === location.parent_id)
+        if (parent.pudorys) {
+          this.pudorys = JSON.parse(parent.pudorys)
+          location.pudorys = JSON.parse(parent.pudorys)
+          this.save(this.id)
+        }
+      },
       udelatObdelnik() {
         const p = this.pudorys
         this.pudorys = [
@@ -124,6 +148,7 @@ import Mapa from '@/components/Mapa.vue'
           [ p[1][0], p[1][1] ],
           [ p[0][0], p[1][1] ],
         ]
+        this.save(this.id)
       },
       ulozitSouradnici(index, hodnota) {
         const match = hodnota.match(/(\-?[0-9]+),\s*(\-?[0-9]+)/)
@@ -148,6 +173,7 @@ import Mapa from '@/components/Mapa.vue'
           pudorys: JSON.stringify(this.pudorys),
           barva: this.barva,
           popisek: this.popisek,
+          vrstva: this.vrstva,
         });
       },
       create() {
@@ -158,7 +184,8 @@ import Mapa from '@/components/Mapa.vue'
           habitability: this.habitability,
           pudorys: [],
           barva: 'white',
-          popisek: ''
+          popisek: '',
+          vrstva: ''
         });
       },
       handleSubmit() {
@@ -180,6 +207,7 @@ import Mapa from '@/components/Mapa.vue'
             this.pudorys = JSON.parse(location.pudorys)
             this.barva = location.barva
             this.popisek = location.popisek
+            this.vrstva = location.vrstva 
         } else {
           this.$router.push("/locations");
         }

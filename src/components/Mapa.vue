@@ -1,6 +1,14 @@
 <template>
     <div class="mapa-frame" ref="mapaFrame">
         <div class="close-button">
+            <ul class="list-group">
+                <li v-for="(vrstva, index) of vrstvy" 
+                    class="list-group-item list-group-item-action" 
+                    :class="vrstva.zobrazit ? 'list-group-item-success' : 'list-group-item-warning'"
+                    @click="vrstvy[index].zobrazit = !vrstvy[index].zobrazit">
+                    {{ vrstva.vrstva }}
+                </li>
+            </ul>
             <button class="btn btn-default" @click="zoom(1.1)">Zvětšit</button>
             <button class="btn btn-default" @click="zoom(0.9)">Zmenšit</button>
             <button type="button" class="btn btn-light" data-dismiss="modal" aria-label="Close" @click="$emit('close')">
@@ -30,7 +38,9 @@ export default {
     data: () => ({
         velikost: 400000,
         _zoom: .2,
-        scrollKey: 0
+        scrollKey: 0,
+        serazeneLokace: [],
+        vrstvy: []
     }),
     computed: {
         locations() {
@@ -38,7 +48,7 @@ export default {
             this.podrizeneLokace(null)
             return this.serazeneLokace.filter(sl => {
                 let souradnice = JSON.parse(sl.pudorys)
-                return !!souradnice.length
+                return !!souradnice.length && (this.vrstvy.find(v => v.zobrazit && v.vrstva === sl.vrstva) || sl.vrstva.length === 0)
             }).map(sl => ({
                 id: sl.id,
                 souradnice: (() => {
@@ -59,7 +69,7 @@ export default {
                     return pudorys.map(p => p.join(',')).join(' ')
                 })(),
                 barva: sl.barva,
-                popisek: sl.popisek
+                popisek: sl.popisek,
             }))
         },
         popisky() {
@@ -67,11 +77,12 @@ export default {
                 const match = l.popisek.match(/((\-?[0-9]+),\s*(\-?[0-9]+)\s*)(.*)/)
                 if (match) {
                     const [ , , x, y, popisek] = match
-                    const [souradnice] = l.pudorys.split(' ')
-                    const [ bx, by ] = souradnice.split(',')
+                    const souradnice = l.pudorys.split(' ')
+                    const bx = souradnice.map(s => s.split(",").map(x => parseInt(x))).reduce((a, b) => a < b[0] ? a : b[0])
+                    const by = souradnice.map(s => s.split(",").map(x => parseInt(x))).reduce((a, b) => a > b[1] ? a : b[1])
                     const result = {
                         x: x ? (parseInt(bx) + parseInt(x)) : null,
-                        y: y ? (parseInt(by) - parseInt(y)) : null,
+                        y: y ? (-parseInt(by) + parseInt(y)) : null,
                         popisek
                     }
                     return result
@@ -118,6 +129,10 @@ export default {
         }
     },
     mounted() {
+        this.vrstvy = Array.from(
+            new Set(
+                this.$store.getters.locations.map(l => l.vrstva)
+            )).filter(v => v).map(v => ({vrstva: v, zobrazit: false }))
         this.center()
     }
 }

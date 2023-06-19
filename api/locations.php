@@ -13,7 +13,7 @@ $data = json_decode(file_get_contents('php://input'), true);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Attempt to prepare and execute the INSERT statement
     try {
-        $stmt = $db->prepare('INSERT INTO locations (name, description, parent_id, project_id, habitability, property) VALUES (:name, :description, :parent_id, :project_id, :habitability, :property)');
+        $stmt = $db->prepare('INSERT INTO locations (name, description, parent_id, project_id, habitability, property, vrstva) VALUES (:name, :description, :parent_id, :project_id, :habitability, :property, :vrstva)');
         $stmt->bindValue(':name', $data['name'], SQLITE3_TEXT);
         $stmt->bindValue(':description', $data['description'], SQLITE3_TEXT);
         $stmt->bindValue(':parent_id', $data['parent_id'], SQLITE3_INTEGER);
@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $stmt->bindValue(':habitability', '', SQLITE3_NULL);
         }
+        $stmt->bindValue(':vrstva', $data['vrstva'], SQLITE3_TEXT);
         $stmt->execute();
         $data['id'] = $db->lastInsertRowID();
         http_response_code(201);
@@ -41,7 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         property=:property, 
         pudorys=:pudorys, 
         barva=:barva, 
-        popisek=:popisek 
+        popisek=:popisek,
+        vrstva=:vrstva 
     WHERE id=:id AND project_id IN (select id from projects where user_id=:user_id)');
     $stmt->bindValue(':name', $data['name'], SQLITE3_TEXT);
     $stmt->bindValue(':description', $data['description'], SQLITE3_TEXT);
@@ -56,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $stmt->bindValue(':habitability', '', SQLITE3_NULL);
     }
+    $stmt->bindValue(':vrstva', $data['vrstva'], SQLITE3_TEXT);
     $stmt->execute();
     http_response_code(204);
 } else if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
